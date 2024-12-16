@@ -1,16 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import ReactPlayer from "react-player";
-// import bkimg from "./bkimg";
-const VideoPlayer = ({ videoUrl }) => {
+import { useLocation } from "react-router-dom";
+import UI from "./UI";
+
+const VideoPlayer = () => {
+  const location = useLocation();
+  const { videoUrl } = location.state || {};
+  console.log("url received", videoUrl);
   const videoRef = useRef(null);
   const [qualityLevels, setQualityLevels] = useState([]);
   const [hlsInstance, setHlsInstance] = useState(null);
   const [audiotype, setAudio] = useState("");
 
-  // useEffect(() => {
-  //   console.log(audiotype);
-  // }, [audiotype]);
   useEffect(() => {
     if (Hls.isSupported() && videoUrl) {
       const hls = new Hls();
@@ -69,17 +71,17 @@ const VideoPlayer = ({ videoUrl }) => {
   };
 
   return (
-    <div className="video-player-container">
+    <div className=" h-screen w-screen flex flex-col justify-center items-center">
       {audiotype > 1 ? (
         <>
+          {" "}
           <video
             ref={videoRef}
-            className="w-full h-full border-blue-300 rounded-md"
+            className="w-[600px] border-blue-300 rounded-md "
             controls
             autoPlay
             muted
           ></video>
-
           {qualityLevels.length > 0 && (
             <div className="quality-selector mt-2 ">
               <label htmlFor="quality" className="mr-2 ">
@@ -103,31 +105,24 @@ const VideoPlayer = ({ videoUrl }) => {
           )}
         </>
       ) : (
-        <div>
-          <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-[250px] border rounded-full w-[250px] ml-[70px] mb-14 ">
-            <img
-              src="https://images.unsplash.com/photo-1612205643212-22b0715c29b8?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              className="h-[200px] w-[200px] border rounded-full ml-6  "
-            ></img>
-            <ReactPlayer
-              url={videoUrl} // Use your audio URL here
-              className=" mt-14"
-              playing={true}
-              controls={true}
-              width="100%"
-              height="50px"
-              // Height of the player, adjust as needed
-
-              config={{
-                file: {
-                  attributes: {
-                    controlsList: "nodownload",
-                    preload: "auto",
-                  },
+        <div className="h-screen w-screen  bg-slate-200 ">
+          <UI className=""></UI>
+          <ReactPlayer
+            url={videoUrl}
+            className=" ml-[20%] mt-[60px] rounded-full"
+            playing={true}
+            controls={true}
+            height="50px"
+            width="60%"
+            config={{
+              file: {
+                attributes: {
+                  controlsList: "nodownload",
+                  preload: "auto",
                 },
-              }}
-            />
-          </div>
+              },
+            }}
+          />
         </div>
       )}
     </div>
