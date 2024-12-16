@@ -3,15 +3,18 @@ import Hls from "hls.js";
 import ReactPlayer from "react-player";
 import { useLocation } from "react-router-dom";
 import UI from "./UI";
+import ProgressBar from "./ProgressBar";
 
 const VideoPlayer = () => {
   const location = useLocation();
   const { videoUrl } = location.state || {};
-  console.log("url received", videoUrl);
+  // console.log("url received", videoUrl);
   const videoRef = useRef(null);
   const [qualityLevels, setQualityLevels] = useState([]);
   const [hlsInstance, setHlsInstance] = useState(null);
   const [audiotype, setAudio] = useState("");
+  const [isplaying, SetIsplaying] = useState(false);
+  const [progessBar, setProgressBar] = useState();
 
   useEffect(() => {
     if (Hls.isSupported() && videoUrl) {
@@ -70,11 +73,12 @@ const VideoPlayer = () => {
     }
   };
 
+  const PlayerRef = React.createRef();
+
   return (
     <div className=" h-screen w-screen flex flex-col justify-center items-center">
       {audiotype > 1 ? (
         <>
-          {" "}
           <video
             ref={videoRef}
             className="w-[600px] border-blue-300 rounded-md "
@@ -106,14 +110,18 @@ const VideoPlayer = () => {
         </>
       ) : (
         <div className="h-screen w-screen  bg-slate-200 ">
-          <UI className=""></UI>
+          <UI SetIsplaying={SetIsplaying} isplaying={isplaying}></UI>
           <ReactPlayer
             url={videoUrl}
             className=" ml-[20%] mt-[60px] rounded-full"
-            playing={true}
+            playing={isplaying}
             controls={true}
-            height="50px"
-            width="60%"
+            onProgress={(state) => {
+              setProgressBar(state.played * 100);
+            }}
+            ref={PlayerRef}
+            height="0px"
+            width="0%"
             config={{
               file: {
                 attributes: {
@@ -122,6 +130,14 @@ const VideoPlayer = () => {
                 },
               },
             }}
+          />
+          {/* const [progessBar, setProgressBar] = useState(); */}
+          <ProgressBar
+            SetIsplaying={SetIsplaying}
+            isplaying={isplaying}
+            progessBar={progessBar}
+            setProgressBar={setProgressBar}
+            playerRef={PlayerRef}
           />
         </div>
       )}
