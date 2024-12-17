@@ -13,13 +13,11 @@ const Home = () => {
     e.preventDefault();
 
     setSendUrlToVideo(url);
-    console.log(sendUrlToVideo, "from home");
   };
-  console.log(sendUrlToVideo, "out side");
+
   useEffect(() => {
-    console.log(url, "chall he starting me");
     setSendUrlToVideo(url);
-    console.log(url, "chall he starting me 2");
+
     {
       sendUrlToVideo &&
         navigate("/videoplayer", { state: { videoUrl: sendUrlToVideo } });
@@ -29,10 +27,11 @@ const Home = () => {
     e.preventDefault();
     if (file) {
       const fileURL = URL.createObjectURL(file);
-      console.log(file.type, +"file types is ");
+      console.log("file ", file);
+      console.log("file type,", file.type);
+      console.log("file blob", fileURL);
 
       setSendUrlToVideo(fileURL);
-      console.log(fileURL, "file uploded");
     } else {
       alert("Please select a file before clicking upload.");
     }

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
-import ReactPlayer from "react-player";
 import { useLocation } from "react-router-dom";
 import UI from "./UI";
 import ProgressBar from "./ProgressBar";
@@ -8,28 +7,33 @@ import ProgressBar from "./ProgressBar";
 const VideoPlayer = () => {
   const location = useLocation();
   const { videoUrl } = location.state || {};
-  // console.log("url received", videoUrl);
+
+  const audioRef = useRef(null);
   const videoRef = useRef(null);
   const [qualityLevels, setQualityLevels] = useState([]);
   const [hlsInstance, setHlsInstance] = useState(null);
   const [audiotype, setAudio] = useState("");
   const [isplaying, SetIsplaying] = useState(false);
-  const [progessBar, setProgressBar] = useState();
+  const [progessBar, setProgressBar] = useState(0);
 
   useEffect(() => {
     if (Hls.isSupported() && videoUrl) {
       const hls = new Hls();
 
+      const attachHLS = () => {
+        if (audioRef.current) {
+          hls.attachMedia(audioRef.current);
+        } else if (videoRef.current) {
+          hls.attachMedia(videoRef.current);
+        }
+      };
+
       hls.loadSource(videoUrl);
       hls.attachMedia(videoRef.current);
+      attachHLS();
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        console.log(
-          "Manifest loaded, found " + hls.levels.length + " quality levels"
-        );
         setAudio(hls.levels.length);
-        console.log(audiotype + "audio type" + hls.levels.length);
-
         setQualityLevels(
           hls.levels.map((level, index) => ({
             index,
@@ -73,22 +77,39 @@ const VideoPlayer = () => {
     }
   };
 
-  const PlayerRef = React.createRef();
+  useEffect(() => {
+    if (audioRef.current) {
+      if (isplaying) {
+        audioRef.current.play();
+      } else {
+        audioRef.current.pause();
+      }
+    }
+  }, [isplaying]);
 
+  const handleProgress = () => {
+    if (audioRef.current) {
+      const progress =
+        (audioRef.current.currentTime / audioRef.current.duration) * 100;
+      setProgressBar(progress);
+    }
+  };
+
+  const PlayerRef = React.createRef();
   return (
-    <div className=" h-screen w-screen flex flex-col justify-center items-center">
+    <div className="h-screen w-screen flex flex-col justify-center items-center">
       {audiotype > 1 ? (
         <>
           <video
             ref={videoRef}
-            className="w-[600px] border-blue-300 rounded-md "
+            className="w-[600px] border-blue-300 rounded-md"
             controls
             autoPlay
             muted
           ></video>
           {qualityLevels.length > 0 && (
-            <div className="quality-selector mt-2 ">
-              <label htmlFor="quality" className="mr-2 ">
+            <div className="quality-selector mt-2">
+              <label htmlFor="quality" className="mr-2">
                 Select Quality:
               </label>
               <select
@@ -96,7 +117,7 @@ const VideoPlayer = () => {
                 onChange={handleQualityChange}
                 className="border rounded-md px-2 py-1"
               >
-                <option value="auto ">Auto</option>
+                <option value="auto">Auto</option>
                 {qualityLevels.map((level) => (
                   <option key={level.index} value={level.index}>
                     {level.resolution
@@ -109,35 +130,23 @@ const VideoPlayer = () => {
           )}
         </>
       ) : (
-        <div className="h-screen w-screen  bg-slate-200 ">
-          <UI SetIsplaying={SetIsplaying} isplaying={isplaying}></UI>
-          <ReactPlayer
-            url={videoUrl}
-            className=" ml-[20%] mt-[60px] rounded-full"
-            playing={isplaying}
-            controls={true}
-            onProgress={(state) => {
-              setProgressBar(state.played * 100);
-            }}
-            ref={PlayerRef}
-            height="0px"
-            width="0%"
-            config={{
-              file: {
-                attributes: {
-                  controlsList: "nodownload",
-                  preload: "auto",
-                },
-              },
-            }}
-          />
-          {/* const [progessBar, setProgressBar] = useState(); */}
+        <div className="h-screen w-screen bg-slate-200">
+          <UI SetIsplaying={SetIsplaying} isplaying={isplaying} />
+          {/* Replacing ReactPlayer with Audio */}
+          <audio
+            autoPlay
+            ref={audioRef}
+            controls
+            className="hidden" // Hide default audio player UI
+            onTimeUpdate={handleProgress} // Mimic onProgress
+          ></audio>
+
           <ProgressBar
             SetIsplaying={SetIsplaying}
             isplaying={isplaying}
             progessBar={progessBar}
             setProgressBar={setProgressBar}
-            playerRef={PlayerRef}
+            playerRef={audioRef}
           />
         </div>
       )}

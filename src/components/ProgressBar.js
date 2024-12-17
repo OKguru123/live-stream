@@ -11,13 +11,16 @@ const ProgressBar = ({
   setProgressBar,
   playerRef,
 }) => {
-  console.log(progessBar);
+  // console.log(progessBar);
 
   const handleTime = (sec) => {
     if (playerRef.current) {
-      const newTime = playerRef.current.getCurrentTime() + sec;
-      playerRef.current.seekTo(newTime);
+      const newTime = playerRef.current.currentTime + sec;
+
+      playerRef.current.currentTime = newTime;
     }
+
+    // console.log(playerRef.current, "current time in sec not working clicked");
   };
   const handleSeek = (event) => {
     if (playerRef.current) {
@@ -25,10 +28,12 @@ const ProgressBar = ({
       const rect = progressBar.getBoundingClientRect(); // Get the dimensions of the progress bar
       const clickX = event.clientX - rect.left; // Calculate click position (X coordinate)
       const newProgress = clickX / rect.width; // Convert click position to percentage (0 to 1)
-      const duration = playerRef.current.getDuration(); // Get the total duration of the media
+
+      const duration = playerRef.current.duration; // Get the total duration of the media
       const seekTime = newProgress * duration; // Convert percentage to time
-      playerRef.current.seekTo(seekTime); // Seek to the calculated time
-      SetIsplaying(true);
+
+      playerRef.current.currentTime = seekTime; // Seek to the calculated time
+      SetIsplaying(true); // Ensure audio is playing after seeking
     }
   };
 
