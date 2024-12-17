@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import { useLocation } from "react-router-dom";
-import UI from "./UI";
-import ProgressBar from "./ProgressBar";
+import UI from "../components/UI";
+import ProgressBar from "../components/ProgressBar";
 
 const VideoPlayer = () => {
   const location = useLocation();
@@ -95,7 +95,6 @@ const VideoPlayer = () => {
     }
   };
 
-  const PlayerRef = React.createRef();
   return (
     <div className="h-screen w-screen flex flex-col justify-center items-center">
       {audiotype > 1 ? (
@@ -132,13 +131,13 @@ const VideoPlayer = () => {
       ) : (
         <div className="h-screen w-screen bg-slate-200">
           <UI SetIsplaying={SetIsplaying} isplaying={isplaying} />
-          {/* Replacing ReactPlayer with Audio */}
+
           <audio
             autoPlay
             ref={audioRef}
             controls
-            className="hidden" // Hide default audio player UI
-            onTimeUpdate={handleProgress} // Mimic onProgress
+            className="hidden"
+            onTimeUpdate={handleProgress}
           ></audio>
 
           <ProgressBar

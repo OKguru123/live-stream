@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const navigate = useNavigate();
-
   const [url, setUrl] = useState("");
   const [sendUrlToVideo, setSendUrlToVideo] = useState();
   const [file, setFile] = useState(null);
@@ -27,9 +26,6 @@ const Home = () => {
     e.preventDefault();
     if (file) {
       const fileURL = URL.createObjectURL(file);
-      console.log("file ", file);
-      console.log("file type,", file.type);
-      console.log("file blob", fileURL);
 
       setSendUrlToVideo(fileURL);
     } else {
